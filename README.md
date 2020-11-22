@@ -1,89 +1,38 @@
-# Redes1-Practica5_Grupo12
+# Redes1-Proyecto_Grupo12
 ## 201700326
 ## 201709244
 
-## Numero de host para las topologias
-
-| Departamento | Cantidad de host |
-| -------------|:----------------:|
-| Profesores   | 42               |
-| Estudiantes  | 72               |
-| Invitados    | 22               |
-
-## Definición de las redes por vlsm
-
-| Direccion de Red | Primera Direccion Asignable | Ultima Direccion Asignable | Direccion de Broadcast |
-|:-------------:|:-------------:|:-------------:|:-------------:| 
-| 192.168.0.0/25 | 192.168.0.1 | 192.168.0.126 | 192.168.0.127 |
-| 192.168.0.128/26 | 192.168.0.129 | 192.168.0.190 | 192.168.0.191 |
-
-<h2>Topologia 1</h2>
-
-![image](https://i.imgur.com/q3akhjq.png)
-
-## Configuracion
-
-### Creación de VLANS
-
-#### Comandos:
-- conf t
-- vlan {numero}
-- name {nombre}
-- end
-  
-Podemos ver en el ESW con vl, si estan todas las vlans creadas
-
-![image](https://i.imgur.com/HUKYSuD.png)
-
-### Configuración de puertos
-- conf t
-- interface {interface}
-- switchport mode trunk
-- end
-
-Verificamos con "sh interfaces status"
-
-![image](https://i.imgur.com/WXK3Vhf.png)
-
-En el switch de capa dos, con la ayuda de la GUI configuramos modo access y trunk
-
-![image](https://i.imgur.com/ajivx2a.png)
-
-### Gateway VLANS
-
-Como tenemos 2 vlans, se procede a hacer subinterfaces
-
-#### Comandos:
-- conf t
-- interface {nombre}
-- ip address {ip} {mascara de subred}
-- end
-
-Verificamos con "sh ip interface brief"
-
-![image](https://i.imgur.com/VhFrvpR.png)
-
-### Ruteo estatico
-Para poder acceder a la topologia 2, se debe aprender las redes que no ve el router
-
-#### Comandos:
-- conf t
-- ip route {ip de la red} {mascara de la red} {ip de la interfaz}
-- end
-
-Para corroborar esto, se debe hacer ping desde un cliente a la otra topologia
-
-![image](https://i.imgur.com/IRpZepG.png)
-
 <h2>Topologia 2</h2>
 
+![image](screens/topologia.png)
+
 ## Configuracion
+
+### Configuracion del VTP
+Lo primero que haremos para implementar la topologia mostrada sera configurar 
+el protocolo VTP en los 3 ESWs. Siendo el ESW2 el vtp maestro y el resto 
+seran vtp clientes.
+Los comandos a utilizar para el ESW2 son:
+- conf t
+- vtp domain TS2GRUPO12
+- vtp password TS2GRUPO12
+- vtp mode server
+- end
+
+Los comandos a utilizar para el ESW1 y 3 son:
+- conf t
+- vtp domain TS2GRUPO12
+- vtp password TS2GRUPO12
+- vtp mode client
+
+Para verificar la configuracion, utilizar el comando sh vtp status.
+![image](screens/vtp.png)
 
 ### Creación de las VLANs
 
-Es necesario crear la vlan nativa de esta topología (INVITADOS) como 
-también crear las vlans que se espera recibir de la topología 1 
-(PROFESORES y ESTUDIANTES). Se procede entonces a crear las vlans.
+Una vez esta configurado el protocolo VTP en los ESW, se procede a 
+crear las vlans en el ESW maestro (ESW2) para que estas sean posteriormente
+propagadas a los otros ESW.
 #### Comandos:
 - conf t
 - vlan {numero}
@@ -103,68 +52,75 @@ Configuramos los puertos en modo Trunk para admitir conexión intervlan.
 - switchport mode trunk
 - end
 
+Pueden verificarse los puertos en modo tronco con el comando
+sh int trunk
+![image](screens/trunk.png)
+
+### Creacion de las interfaces vlan
+Para implementar el correcto ruteo intervlan se procede a configurar 
+una direccion IP para cada red vlan de la siguiente manera:
+
+- conf t
+- int vlan {VLAN NUMBER}
+- ip address {IP ADDRESS} {MASCARA DE SUBRED}
+- end
+
+Hacemos el procedimiento en cada uno de los 3 ESWs asignandoles direcciones de
+red validas dentro de cada vlan a las que estan asociadas.<br>
+Puede verificarse la creacion de las interfaces vlan con el comando
+sh ip interface brienf | inc Vlan
+
+![image](screens/intvlans.png)
+
+### Creacion del Gateway Virtual
+Para implementar el protocolo de redundancia en el Gateway se escogio el 
+protocolo HSRP. Se designo como equipo activo al ESW2, el ESW1 como standby
+y finalmente el ESW3 como estado listen que asumira el estado de activo 
+como ultimo en prioridad.
+
+- conf t
+- int vlan {VLAN NUMBER}
+- standby 1 70.0.50.254
+- standby 1 priority 120
+- standby 1 preempt delay minimum 5
+- end
+
+Repetimos el procedimiento en cada Router con la misma direccion de red virtual, pero cambiando el numero de 
+grupo y el numero de prioridad (la prioridad mas alta para el ESW2, luego el ESW1 y finalmente la mas
+baja para el ESW3)
+<br>
+Puede verificarse la correcta configuracion del protocolo con el comando sh standby brief
+
+![image](screens/hsrp.png)
+
+### Ruteo dinamico
+
 ### EIGRP
 
-Procedemos a configurar el EIGRP.
-
-#### R2
-
-##### Comandos
-- conf t
-- router eigrp 10
-- network 10.10.0.0 0.0.0.255
-- network 20.10.0.0 0.0.0.255
-- network 192.168.15.0 0.0.0.255
-- end
-
-#### R3
+Procedemos a configurar el para el ruteo dinamico 
+dentro de la topologia.
 
 ##### Comandos
 - conf t
-- router eigrp 10
-- network 10.10.0.0 0.0.0.255
-- network 20.10.0.0 0.0.0.255
-- network 192.168.15.0 0.0.0.255
-- end
-
-#### R4
-
-##### Comandos
-- conf t
-- router eigrp 10
-- network 10.10.0.0 0.0.0.255
-- network 20.10.0.0 0.0.0.255
-- network 192.168.15.0 0.0.0.255
-- end
-
-### VRRP
-Ahora procedemos a configurar el VRRP.
-
-#### R3
-- conf t
-- vrrp 10
-- vrrp 10 ip 192.168.15.3
-- vrrp 10 priority 120
-- vrrp 10 preempt
-- end
-
-#### R4
-- conf t
-- vrrp 10
-- vrrp 10 ip 192.168.15.3
-- vrrp 10 priority 100
+- router eigrp 555
+- network 70.0.50.0 0.0.0.255
+- network 70.0.60.0 0.0.0.255
+- network 8.0.0.0 0.255.255.255
+- no auto-summary
 - end
 
 ### Ruteo estatico
-Finalmente debemos aprender las redes de la topología 1. Hacemos 
-esto de la siguiente manera:
 
-#### Comandos:
+Finalmente procedemos a configurar el ruteo estatico hacia
+las redes de la topologia 1, siguiendo el formato:
+
+#### R3
 - conf t
-- ip route {ip de la red} {mascara de la red} {ip de la interfaz}
-- end
+- ip route {NETWORK IP} {MASK} {TARGET INTERFACE}
 
-Realizamos este proceso en todos los Routers de la topología (R2,R3,R4).
+Realizamos este proceso para todas las 10 redes de la topologia
+1 en cada uno de los ESW y en el Router R1.
 
 Finalmente comprobamos realizando un ping a clientes de la topología 1.
+![image](screens/windows.png)
 ![image](screens/linux.png)
