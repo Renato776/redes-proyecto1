@@ -109,6 +109,8 @@ dentro de la topologia.
 - no auto-summary
 - end
 
+![image](screens/eigrp.png)
+
 ### Ruteo estatico
 
 Finalmente procedemos a configurar el ruteo estatico hacia
@@ -119,7 +121,11 @@ las redes de la topologia 1, siguiendo el formato:
 - ip route {NETWORK IP} {MASK} {TARGET INTERFACE}
 
 Realizamos este proceso para todas las 10 redes de la topologia
-1 en cada uno de los ESW y en el Router R1.
+1 en cada uno de los ESW y en el Router R1. <br>
+Finalmente comprobamos todas las redes aprendidas por el Router 
+con el comando sh ip route.
+
+![image](screens/routes.png)
 
 Finalmente comprobamos realizando un ping a clientes de la topología 1.
 ![image](screens/windows.png)
