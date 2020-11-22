@@ -333,3 +333,5 @@ con el comando sh ip route.
 Finalmente comprobamos realizando un ping a clientes de la topología 1.
 ![image](screens/windows.png)
 ![image](screens/linux.png)
+Finalmente la captura de paquetes asociada a este ping utilizando WireShark
+![image](screens/packets.png)
