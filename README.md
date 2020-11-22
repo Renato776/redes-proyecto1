@@ -190,6 +190,17 @@ Se capturara de un ping de la 192.168.40.20 a la 192.168.10.10 en el siguiente p
 
 <h2>Topologia 2</h2>
 
+
+## Definición de las redes topologia 2
+
+| Direccion de Red | Primera Direccion Asignable | Ultima Direccion Asignable | Direccion de Broadcast |
+|:-------------:|:-------------:|:-------------:|:-------------:| 
+| 8.0.0.0/8 | 8.0.0.1 | 8.255.255.254 | 8.255.255.255 |
+| 7.0.0.0/8 | 7.0.0.1 | 7.255.255.254 | 7.255.255.255 |
+| 6.0.0.0/8 | 6.0.0.1 | 6.255.255.254 | 6.255.255.255 |
+| 70.0.50.0/24   | 70.0.50.1     | 70.0.50.254     | 70.0.50.255     |
+| 70.0.60.0/24   | 70.0.60.1     | 70.0.60.254     | 70.0.60.255     |
+
 ![image](screens/topologia.png)
 
 ## Configuracion
@@ -278,6 +289,12 @@ baja para el ESW3)
 Puede verificarse la correcta configuracion del protocolo con el comando sh standby brief
 
 ![image](screens/hsrp.png)
+
+### STP
+Para verificar el correcto funcionamiento del STP, se han inspeccionado los puertos
+habilitados y los bloqueados para evitar loops. La ruta resultante puede apreciarse 
+a continuacion.
+![image](screens/path.png)
 
 ### Ruteo dinamico
 
