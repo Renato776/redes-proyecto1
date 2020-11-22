@@ -1,0 +1,197 @@
+----------------------- R1 -----------------------------------------
+interface FastEthernet0/0
+ ip address 6.6.6.200 255.0.0.0
+ speed 100
+ full-duplex
+          
+interface FastEthernet0/1
+ ip address 7.7.7.200 255.0.0.0
+ speed 100
+ full-duplex
+          
+interface FastEthernet1/0
+ ip address 8.8.8.200 255.0.0.0
+ speed 100
+ full-duplex
+          
+interface FastEthernet2/0
+ ip address 90.0.0.1 255.255.255.0
+ speed 100
+ full-duplex
+          
+router eigrp 555
+ network 6.0.0.0
+ network 7.0.0.0
+ network 8.0.0.0
+ network 90.0.0.0 0.0.0.255
+ no auto-summary
+          
+ip route 22.0.0.0 255.255.255.0 90.0.0.2
+ip route 32.0.0.0 255.255.255.0 90.0.0.2
+ip route 42.0.0.0 255.255.255.0 90.0.0.2
+ip route 52.0.0.0 255.255.255.0 90.0.0.2
+ip route 62.0.0.0 255.255.255.0 90.0.0.2
+ip route 72.0.0.0 255.255.255.0 90.0.0.2
+ip route 192.168.10.0 255.255.255.0 90.0.0.2
+ip route 192.168.20.0 255.255.255.0 90.0.0.2
+ip route 192.168.30.0 255.255.255.0 90.0.0.2
+ip route 192.168.40.0 255.255.255.0 90.0.0.2
+
+---------------------------- ESW1 --------------------------------------
+interface FastEthernet0/0
+ ip address 6.6.6.201 255.0.0.0
+ speed 100
+ full-duplex
+          
+interface FastEthernet0/1
+ no ip address
+ shutdown 
+ duplex auto
+ speed auto
+ standby 1 preempt
+          
+interface FastEthernet1/0
+ switchport mode trunk
+ duplex full
+ speed 100
+          
+interface FastEthernet1/1
+ switchport mode trunk
+ duplex full
+ speed 100
+           
+interface Vlan62
+ ip address 70.0.50.251 255.255.255.0
+ standby 1 ip 70.0.50.254
+ standby 1 priority 90
+ standby 1 preempt delay minimum 5
+           
+interface Vlan72
+ ip address 70.0.60.251 255.255.255.0
+ standby 2 ip 70.0.60.254
+ standby 2 preempt delay minimum 5
+           
+router eigrp 555
+ network 6.0.0.0
+ network 70.0.50.0 0.0.0.255
+ network 70.0.60.0 0.0.0.255
+ no auto-summary
+           
+ip route 22.0.0.0 255.255.255.0 6.6.6.200
+ip route 32.0.0.0 255.255.255.0 6.6.6.200
+ip route 42.0.0.0 255.255.255.0 6.6.6.200
+ip route 52.0.0.0 255.255.255.0 6.6.6.200
+ip route 62.0.0.0 255.255.255.0 6.6.6.200
+ip route 72.0.0.0 255.255.255.0 6.6.6.200
+ip route 192.168.10.0 255.255.255.0 6.6.6.200
+ip route 192.168.20.0 255.255.255.0 6.6.6.200
+ip route 192.168.30.0 255.255.255.0 6.6.6.200
+ip route 192.168.40.0 255.255.255.0 6.6.6.200
+
+---------------------------- ESW2 --------------------------------------
+interface FastEthernet0/0
+ ip address 7.7.7.201 255.0.0.0
+ speed 100
+ full-duplex
+          
+interface FastEthernet0/1
+ no ip address
+ shutdown 
+ duplex auto
+ speed auto
+ standby 1 preempt
+          
+interface FastEthernet1/0
+ switchport mode trunk
+ duplex full
+ speed 100
+          
+interface FastEthernet1/1
+ switchport mode trunk
+ duplex full
+ speed 100
+          
+interface Vlan62
+ ip address 70.0.50.252 255.255.255.0
+ standby 0 preempt delay minimum 5
+ standby 1 ip 70.0.50.254
+ standby 1 priority 110
+          
+interface Vlan72
+ ip address 70.0.60.252 255.255.255.0
+ standby 2 ip 70.0.60.254
+ standby 2 priority 120
+ standby 2 preempt delay minimum 5
+          
+router eigrp 555
+ network 7.0.0.0
+ network 8.0.0.0
+ network 70.0.50.0 0.0.0.255
+ network 70.0.60.0 0.0.0.255
+ no auto-summary
+          
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 70.12.50.254
+ip route 22.0.0.0 255.255.255.0 7.7.7.200
+ip route 32.0.0.0 255.255.255.0 7.7.7.200
+ip route 42.0.0.0 255.255.255.0 7.7.7.200
+ip route 52.0.0.0 255.255.255.0 7.7.7.200
+ip route 62.0.0.0 255.255.255.0 7.7.7.200
+ip route 72.0.0.0 255.255.255.0 7.7.7.200
+ip route 192.168.10.0 255.255.255.0 7.7.7.200
+ip route 192.168.20.0 255.255.255.0 7.7.7.200
+ip route 192.168.30.0 255.255.255.0 7.7.7.200
+ip route 192.168.40.0 255.255.255.0 7.7.7.200
+
+-------------------------- ESW3 ----------------------------
+interface FastEthernet0/0
+ ip address 8.8.8.201 255.0.0.0
+ speed 100
+ full-duplex
+          
+interface FastEthernet0/1
+ no ip address
+ shutdown 
+ duplex auto
+ speed auto
+ standby 1 preempt
+          
+interface FastEthernet1/0
+ switchport mode trunk
+ duplex full
+ speed 100
+          
+interface FastEthernet1/1
+ switchport mode trunk
+ duplex full
+ speed 100
+          
+interface Vlan62
+ ip address 70.0.50.253 255.255.255.0
+ standby 1 ip 70.0.50.254
+ standby 1 priority 50
+ standby 1 preempt delay minimum 5
+          
+interface Vlan72
+ ip address 70.0.60.253 255.255.255.0
+ standby 2 ip 70.0.60.254
+ standby 2 priority 50
+ standby 2 preempt delay minimum 5
+          
+router eigrp 555
+ network 8.0.0.0
+ network 70.0.50.0 0.0.0.255
+ network 70.0.60.0 0.0.0.255
+ no auto-summary
+          
+ip forward-protocol nd
+ip route 22.0.0.0 255.255.255.0 8.8.8.200
+ip route 32.0.0.0 255.255.255.0 8.8.8.200
+ip route 42.0.0.0 255.255.255.0 8.8.8.200
+ip route 52.0.0.0 255.255.255.0 8.8.8.200
+ip route 62.0.0.0 255.255.255.0 8.8.8.200
+ip route 72.0.0.0 255.255.255.0 8.8.8.200
+ip route 192.168.10.0 255.255.255.0 8.8.8.200
+ip route 192.168.20.0 255.255.255.0 8.8.8.200
+ip route 192.168.30.0 255.255.255.0 8.8.8.200
+ip route 192.168.40.0 255.255.255.0 8.8.8.200
